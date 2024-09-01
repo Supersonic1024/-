@@ -54,8 +54,7 @@ int main(int argc, char *argv[])
   printf("m=%d,n=%d,k=%d,alpha=%lf,beta=%lf,sizeofc=%d\n", m, n, k, alpha, beta, sizeofc);
   gettimeofday(&start, NULL);
   //cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
-  gettimeofday(&finish, NULL);
-
+ 
   for (i=0;i <m;i++)
   {
     for(int j=0;j <n;j++)
@@ -67,6 +66,8 @@ int main(int argc, char *argv[])
       }
     }
   }
+  gettimeofday(&finish, NULL);
+
   // 转成成秒数
   duration = (double)(finish.tv_sec - start.tv_sec) + (double)(finish.tv_usec - start.tv_usec) / 1.0e6;
   double gflops = 4.0 * m * n * k;
