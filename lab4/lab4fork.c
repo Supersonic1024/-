@@ -8,9 +8,9 @@
 #include <unistd.h>
 #include "time.h"
 
-#define M 3
-#define N 3
-#define K 2
+#define M 1024
+#define N 1024
+#define K 1024
 
 
 void dgemm(int m, int n, int k, int beta,
@@ -36,19 +36,39 @@ void printf_matrix(int row, int col, double matrix[row][col] ){
 }
 
 
-void main()
+int main(int argc, char *argv[])
 {
-    double A[M][K] = { {1.0,  -3.0},
-                      {2.0,  4.0},
-                      {1.0, -1.0} };         
-    double B[K][N] = { {1.0,  2.0,  1.0},
-                      {-3.0, 4.0, -1.0} };  
-    double C[M][N] = { {.5, .5, .5}, 
-                      {.5, .5, .5},
-                      {.5, .5, .5} }; 
+    // 动态分配内存  
+    double (*A)[K] = malloc(M * sizeof(double[K]));  
+    double (*B)[N] = malloc(K * sizeof(double[N]));  
+    double (*C)[N] = malloc(M * sizeof(double[N]));  
+    
+    // 确保内存分配成功  
+    if (A == NULL || B == NULL || C == NULL) {  
+        fprintf(stderr, "Memory allocation failed!\n");  
+        exit(1);  
+    }  
 
-    printf_matrix(M,K,A);
-    printf_matrix(K,N,B);
+    // 初始化矩阵 A 和 B  
+    for (int i = 0; i < M; i++) {  
+        for (int j = 0; j < K; j++) {  
+            A[i][j] = (double)(i + j);  
+        }  
+    }  
+
+    for (int i = 0; i < K; i++) {  
+        for (int j = 0; j < N; j++) {  
+            B[i][j] = (double)(i - j);  
+        }  
+    }  
+
+    // 初始化矩阵 C  
+    for (int i = 0; i < M; i++) {  
+        for (int j = 0; j < N; j++) {  
+            C[i][j] = 0.5; // 初始化 C  
+        }  
+    }  
+
     int rc = fork();
     if (rc < 0)
     {//fork failed; exit
@@ -72,7 +92,7 @@ void main()
 
         //C=A*B + beta*C
         dgemm(M,N,K,2, A,B,C);
-        printf_matrix(M,N,C);
+        //printf_matrix(M,N,C);
         // 结束时钟时间  
         end_clock = clock();
         // 结束墙钟时间  
@@ -98,7 +118,7 @@ void main()
 
         //C=A*B + beta*C
         dgemm(M,N,K,2, A,B,C);
-        printf_matrix(M,N,C); 
+        //printf_matrix(M,N,C); 
         end_clock = clock();
         time(&end_time);  
 
@@ -107,5 +127,5 @@ void main()
         elapsed_time = difftime(end_time, start_time);  
         printf("墙钟时间: %f秒\n", elapsed_time); 
     }
-    
+    return 0;
 }
